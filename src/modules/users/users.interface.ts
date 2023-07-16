@@ -8,6 +8,11 @@ export type IUser = {
     firstName: string
     lastName: string
   }
+  wishlist: [
+    {
+      bookId: Types.ObjectId
+    }
+  ]
 }
 
 export interface UserModel extends Model<IUser> {

@@ -8,13 +8,22 @@ import httpStatus from 'http-status'
 import { JwtPayload } from 'jsonwebtoken'
 
 // get a single user
-const getMyProfile = async (
+const addBookToWishList = async (
+  bookId: mongoose.Types.ObjectId,
   requestPayload: JwtPayload | null
 ): Promise<IUser> => {
-  const user = await User.findById({
-    _id: new mongoose.Types.ObjectId(requestPayload?.userId),
-    role: requestPayload?.role,
-  })
+  const user = await User.findOneAndUpdate(
+    {
+      _id: requestPayload?.userId,
+      wishlist: { $nin: [{ bookId: bookId }] }, // Ensure the bookId is not already in the wishlist
+    },
+    {
+      $addToSet: {
+        wishlist: { bookId: bookId },
+      },
+    },
+    { new: true }
+  )
 
   if (user) {
     return user
@@ -23,7 +32,6 @@ const getMyProfile = async (
   }
 }
 
-
 export default {
-  getMyProfile
+  addBookToWishList,
 }

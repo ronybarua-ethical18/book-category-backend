@@ -1,6 +1,7 @@
 import express, { Router } from 'express'
 import authRoute from '../modules/auth/auth.route'
-import userRoutes from '../modules/users/users.route'
+import bookRoutes from "../modules/books/books.route"
+import userRoutes from "../modules/users/users.route"
 
 const router = express.Router()
 
@@ -14,6 +15,10 @@ const routeList: IRoute[] = [
   {
     path: '/auth',
     route: authRoute,
+  },
+  {
+    path: '/books',
+    route: bookRoutes,
   },
   {
     path: '/users',

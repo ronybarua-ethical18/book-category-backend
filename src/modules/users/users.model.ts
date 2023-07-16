@@ -24,6 +24,14 @@ const userSchema = new Schema<IUser>(
       type: String,
       select: false, // Hide the hashedPassword field in response object to prevent leakage of sensitive
     },
+    wishlist: [
+      {
+        bookId: {
+          type:Schema.Types.ObjectId,
+          ref: 'Book',
+        }
+      },
+    ],
   },
   {
     timestamps: true,
