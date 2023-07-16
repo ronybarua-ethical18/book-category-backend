@@ -27,9 +27,9 @@ const userSchema = new Schema<IUser>(
     wishlist: [
       {
         bookId: {
-          type:Schema.Types.ObjectId,
+          type: Schema.Types.ObjectId,
           ref: 'Book',
-        }
+        },
       },
     ],
   },
@@ -41,7 +41,9 @@ const userSchema = new Schema<IUser>(
 userSchema.statics.isUserExist = async function (
   email: string
 ): Promise<IUser | null> {
-  return await User.findOne({ email: email }).select('+password')
+  return await User.findOne({ email: email })
+    .select('+password')
+    .populate('wishlist.bookId')
 }
 
 userSchema.statics.isPasswordMatched = async function (

@@ -51,8 +51,10 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
     config.jwt.expires_in as string
   )
 
+  
   return {
     accessToken,
+    wishList:isUserExist.wishlist
   }
 }
 

@@ -8,7 +8,7 @@ export type ILoginUser = {
 
 export type ILoginUserResponse = {
   accessToken: string
-  refreshToken?: string
+  wishList?: object[]
 }
 
 export type IVerifiedLoginUser = {
