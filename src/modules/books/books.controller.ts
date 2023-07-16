@@ -20,6 +20,24 @@ const createBook = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const addReview = catchAsync(async (req: Request, res: Response) => {
+  const requestPayload = req.user
+
+  if (typeof req.params.id === 'string') {
+    const book = await usersService.addReview(
+      requestPayload,
+      req.body,
+      new mongoose.Types.ObjectId(req.params.id)
+    )
+    sendResponse<IBook>(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: `Review is created successfully`,
+      data: book,
+    })
+  }
+})
+
 const getAllBooks = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, booksFilterableFields)
   const book = await usersService.getAllBooks(filters)
@@ -64,9 +82,27 @@ const updateBook = catchAsync(async (req: Request, res: Response) => {
   }
 })
 
+const deleteBook = catchAsync(async (req: Request, res: Response) => {
+  const requestPayload = req.user
+  if (typeof req.params.id === 'string') {
+    const book = await usersService.deleteBook(
+      new mongoose.Types.ObjectId(req.params.id),
+      requestPayload
+    )
+    sendResponse<IBook>(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: `Book is deleted successfully`,
+      data: book,
+    })
+  }
+})
+
 export default {
   createBook,
   getAllBooks,
   getSingleBook,
   updateBook,
+  deleteBook,
+  addReview,
 }

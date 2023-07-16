@@ -14,5 +14,7 @@ router.post(
 router.get('/', auth(), booksController.getAllBooks)
 router.get('/:id', auth(), booksController.getSingleBook)
 router.put('/:id', auth(), booksController.updateBook)
+router.delete('/:id', auth(), booksController.deleteBook)
+router.patch('/reviews/:id', auth(), booksController.addReview)
 
 export default router

@@ -1,8 +1,10 @@
 import { Model, Types } from 'mongoose'
 
-interface IReview {
+export interface IReview {
+  [x: string]: any
   user: string
   comment: string
+  bookId?: Types.ObjectId
 }
 
 export type IBook = {
