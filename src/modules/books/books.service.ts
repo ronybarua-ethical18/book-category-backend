@@ -16,28 +16,28 @@ const createBook = async (
 }
 
 const getAllBooks = async (filters: IBookSearchFields): Promise<IBook[]> => {
-  const andConditions = [];
+  const andConditions = []
 
-  console.log('filters', filters);
+  console.log('filters', filters)
 
   if (filters) {
-    const filterConditions = Object.keys(filters).map((field) => ({
+    const filterConditions = Object.keys(filters).map(field => ({
       [field]: {
         $regex: new RegExp(filters[field], 'i'), // Use the filter value instead of the field name
       },
-    }));
+    }))
 
     if (filterConditions.length > 0) {
-      andConditions.push(...filterConditions); // Spread the filter conditions into andConditions array
+      andConditions.push(...filterConditions) // Spread the filter conditions into andConditions array
     }
   }
 
-  const conditions = andConditions.length > 0 ? { $and: andConditions } : {};
+  const conditions = andConditions.length > 0 ? { $and: andConditions } : {}
 
-  console.log('conditions', conditions);
-  const books = await Book.find(conditions);
-  return books;
-};
+  console.log('conditions', conditions)
+  const books = await Book.find(conditions)
+  return books
+}
 
 const getSingleBook = async (
   bookId: mongoose.Types.ObjectId,
@@ -51,8 +51,28 @@ const getSingleBook = async (
   return book
 }
 
+const updateBook = async (
+  bookId: mongoose.Types.ObjectId,
+  requestPayload: JwtPayload | null,
+  updatePayload: IBook
+): Promise<IBook | null> => {
+  const book = await Book.findOne({ _id: bookId, user: requestPayload?.userId })
+
+  if (!book) {
+    throw new ApiError(404, 'Book not found')
+  }
+
+  const updateBook = await Book.findByIdAndUpdate(
+    { _id: bookId },
+    { ...updatePayload },
+    { new: true }
+  )
+  return updateBook
+}
+
 export default {
   createBook,
   getAllBooks,
   getSingleBook,
+  updateBook,
 }

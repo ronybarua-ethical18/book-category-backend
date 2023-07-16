@@ -6,9 +6,10 @@ import { jwtHelpers } from '../../helpers/jwtHelpers'
 import config from '../../config'
 import { IUser } from '../users/users.interface'
 import { User } from '../users/users.model'
+import bcrypt from 'bcrypt'
 
 const signup = async (payload: ILoginUser): Promise<IUser> => {
-  const { email } = payload
+  const { email, password } = payload
 
   const isUserExist = await User.isUserExist(email)
 
@@ -16,7 +17,12 @@ const signup = async (payload: ILoginUser): Promise<IUser> => {
     throw new ApiError(httpStatus.FOUND, 'user already exist')
   }
 
-  const user = await User.create(payload)
+  const hashPassword = await bcrypt.hash(
+    password,
+    Number(config.bcrypt_salt_rounds)
+  )
+
+  const user = await User.create({ ...payload, password: hashPassword })
 
   return user
 }

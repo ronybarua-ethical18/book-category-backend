@@ -52,15 +52,15 @@ userSchema.statics.isPasswordMatched = async function (
 }
 
 // User.create() / user.save()
-userSchema.pre('save', async function (next) {
-  // hashing user password
-  const user = this
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_rounds)
-  )
-  next()
-})
+// userSchema.pre('save', async function (next) {
+//   // hashing user password
+//   const user = this
+//   user.password = await bcrypt.hash(
+//     user.password,
+//     Number(config.bcrypt_salt_rounds)
+//   )
+//   next()
+// })
 
 //remove password field
 userSchema.methods.toJSON = function () {

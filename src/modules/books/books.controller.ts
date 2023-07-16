@@ -41,7 +41,24 @@ const getSingleBook = catchAsync(async (req: Request, res: Response) => {
     sendResponse<IBook>(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: `All Books are fetched successfully`,
+      message: `Single book is fetched successfully`,
+      data: book,
+    })
+  }
+})
+
+const updateBook = catchAsync(async (req: Request, res: Response) => {
+  const requestPayload = req.user
+  if (typeof req.params.id === 'string') {
+    const book = await usersService.updateBook(
+      new mongoose.Types.ObjectId(req.params.id),
+      requestPayload,
+      req.body
+    )
+    sendResponse<IBook>(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: `Book is updated successfully`,
       data: book,
     })
   }
@@ -51,4 +68,5 @@ export default {
   createBook,
   getAllBooks,
   getSingleBook,
+  updateBook,
 }

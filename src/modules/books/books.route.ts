@@ -13,5 +13,6 @@ router.post(
 )
 router.get('/', auth(), booksController.getAllBooks)
 router.get('/:id', auth(), booksController.getSingleBook)
+router.put('/:id', auth(), booksController.updateBook)
 
 export default router

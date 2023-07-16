@@ -10,7 +10,7 @@ const addBookToWishList = catchAsync(async (req: Request, res: Response) => {
   const requestPayload = req.user
 
   const user = await usersService.addBookToWishList(
-    new mongoose.Types.ObjectId(req.body),
+    new mongoose.Types.ObjectId(req.body.bookId),
     requestPayload
   )
   sendResponse<IUser>(res, {
