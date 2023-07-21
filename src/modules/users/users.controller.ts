@@ -21,6 +21,19 @@ const addBookToWishList = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const getBooksFromWishlist = catchAsync(async (req: Request, res: Response) => {
+  const requestPayload = req.user
+
+  const user = await usersService.getBooksFromWishlist(requestPayload)
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Books from wishlist are retrieved`,
+    data: user,
+  })
+})
+
 export default {
   addBookToWishList,
+  getBooksFromWishlist,
 }

@@ -10,6 +10,9 @@ export interface IReview {
 export type IBook = {
   title: string
   author: string
+  img_url:string
+  price:number
+  description:string
   genre: string
   publication_date: string
   reviews: IReview

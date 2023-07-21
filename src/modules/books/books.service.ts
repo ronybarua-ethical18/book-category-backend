@@ -44,7 +44,7 @@ const getSingleBook = async (
   bookId: mongoose.Types.ObjectId,
   requestPayload: JwtPayload | null
 ): Promise<IBook> => {
-  const book = await Book.findOne({ _id: bookId, user: requestPayload?.userId })
+  const book = await Book.findOne({ _id: bookId })
 
   if (!book) {
     throw new ApiError(404, 'Book not found')
@@ -60,7 +60,7 @@ const updateBook = async (
   const book = await Book.findOne({ _id: bookId, user: requestPayload?.userId })
 
   if (!book) {
-    throw new ApiError(404, 'Book not found')
+    throw new ApiError(404, 'Only book owner can update the book details')
   }
 
   const updateBook = await Book.findByIdAndUpdate(
@@ -88,7 +88,7 @@ const deleteBook = async (
 const addReview = async (
   requestPayload: JwtPayload | null,
   commentWithBookId: IReview,
-  bookId:mongoose.Types.ObjectId
+  bookId: mongoose.Types.ObjectId
 ): Promise<IBook> => {
   const book = await Book.findOne({
     _id: bookId,

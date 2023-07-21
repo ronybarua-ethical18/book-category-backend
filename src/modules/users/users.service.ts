@@ -6,6 +6,7 @@ import { User } from './users.model'
 import ApiError from '../../errors/ApiError'
 import httpStatus from 'http-status'
 import { JwtPayload } from 'jsonwebtoken'
+import { IBook } from '../books/books.interface'
 
 // get a single user
 const addBookToWishList = async (
@@ -34,6 +35,20 @@ const addBookToWishList = async (
   return user
 }
 
+const getBooksFromWishlist = async (
+  requestPayload: JwtPayload | null
+): Promise<IUser> => {
+  const user = await User.findOne({ _id: requestPayload?.userId }).populate(
+    'wishlist.bookId'
+  )
+
+  if (!user) {
+    throw new ApiError(404, 'user not found')
+  }
+  return user
+}
+
 export default {
   addBookToWishList,
+  getBooksFromWishlist,
 }

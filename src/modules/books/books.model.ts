@@ -17,6 +17,16 @@ const bookSchema = new Schema<IBook>(
     publication_date: {
       type: String,
     },
+    img_url: {
+      type: String,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    description: {
+      type: String,
+    },
     reviews: [
       {
         user: {
