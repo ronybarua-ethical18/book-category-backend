@@ -46,5 +46,10 @@ const bookSchema = new Schema<IBook>(
     timestamps: true,
   }
 )
+bookSchema.index({
+  title: 'text',
+  author: 'text',
+  genre: 'text',
+})
 
 export const Book = mongoose.model<IBook>('Book', bookSchema)

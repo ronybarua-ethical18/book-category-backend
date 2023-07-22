@@ -40,7 +40,7 @@ const addReview = catchAsync(async (req: Request, res: Response) => {
 
 const getAllBooks = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, booksFilterableFields)
-  const book = await usersService.getAllBooks(filters)
+  const book = await usersService.getAllBooks(filters, req.query)
   sendResponse<IBook[]>(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -50,11 +50,9 @@ const getAllBooks = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getSingleBook = catchAsync(async (req: Request, res: Response) => {
-  const requestPayload = req.user
   if (typeof req.params.id === 'string') {
     const book = await usersService.getSingleBook(
-      new mongoose.Types.ObjectId(req.params.id),
-      requestPayload
+      new mongoose.Types.ObjectId(req.params.id)
     )
     sendResponse<IBook>(res, {
       statusCode: httpStatus.OK,

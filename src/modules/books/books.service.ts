@@ -16,33 +16,40 @@ const createBook = async (
   return book
 }
 
-const getAllBooks = async (filters: IBookSearchFields): Promise<IBook[]> => {
-  const andConditions = []
+const getAllBooks = async (filters: IBookSearchFields, requestQueries: any): Promise<IBook[]> => {
+  // Initialize the queries object
+  const queries: any = {};
 
-  console.log('filters', filters)
-
-  if (filters) {
-    const filterConditions = Object.keys(filters).map(field => ({
-      [field]: {
-        $regex: new RegExp(filters[field], 'i'), // Use the filter value instead of the field name
-      },
-    }))
-
-    if (filterConditions.length > 0) {
-      andConditions.push(...filterConditions) // Spread the filter conditions into andConditions array
-    }
+  const regex = new RegExp(requestQueries.text, "i");
+  if (requestQueries.text) {
+    queries.$or = [
+      { title: regex },
+      { genre: regex },
+      { author: regex },
+      { publication_date: regex },
+    ];
   }
+  console.log('modified queries', queries)
+  // Add other filter conditions as needed
+  // For example, if you have filters like "author", "genre", etc., you can add them similarly
 
-  const conditions = andConditions.length > 0 ? { $and: andConditions } : {}
+  // Uncomment the following lines if you have additional filters in the "filters" object:
+  // if (filters.author) {
+  //   queries.author = filters.author;
+  // }
+  // if (filters.genre) {
+  //   queries.genre = filters.genre;
+  // }
+  // ...
 
-  console.log('conditions', conditions)
-  const books = await Book.find(conditions)
-  return books
-}
+  // Use the constructed queries to find books in the database
+  const books = await Book.find(queries);
+
+  return books;
+};
 
 const getSingleBook = async (
   bookId: mongoose.Types.ObjectId,
-  requestPayload: JwtPayload | null
 ): Promise<IBook> => {
   const book = await Book.findOne({ _id: bookId })
 
@@ -78,7 +85,7 @@ const deleteBook = async (
   const book = await Book.findOne({ _id: bookId, user: requestPayload?.userId })
 
   if (!book) {
-    throw new ApiError(404, 'Book not found')
+    throw new ApiError(404, 'Only book owner can delete the book')
   }
 
   const bookDelete = await Book.findByIdAndDelete({ _id: bookId })
