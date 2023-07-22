@@ -25,37 +25,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const catchAsync_1 = __importDefault(require("../../shared/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../shared/sendResponse"));
-const config_1 = __importDefault(require("../../config"));
 const auth_service_1 = require("./auth.service");
 const loginUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const loginData = __rest(req.body, []);
     const result = yield auth_service_1.AuthService.loginUser(loginData);
-    const { refreshToken } = result, others = __rest(result
-    // set refresh token into cookie
-    , ["refreshToken"]);
-    // set refresh token into cookie
-    const cookieOptions = {
-        secure: config_1.default.env === 'production',
-        httpOnly: true,
-    };
-    res.cookie('refreshToken', refreshToken, cookieOptions);
-    (0, sendResponse_1.default)(res, {
-        statusCode: 200,
-        success: true,
-        message: 'User logged in successfully !',
-        data: others,
-    });
-}));
-const refreshToken = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('request', req.cookies);
-    const { refreshToken } = req.cookies;
-    const result = yield auth_service_1.AuthService.refreshToken(refreshToken);
-    // set refresh token into cookie
-    const cookieOptions = {
-        secure: config_1.default.env === 'production',
-        httpOnly: true,
-    };
-    res.cookie('refreshToken', refreshToken, cookieOptions);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
@@ -63,7 +36,17 @@ const refreshToken = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
         data: result,
     });
 }));
+const signUp = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const signUpData = __rest(req.body, []);
+    const result = yield auth_service_1.AuthService.signup(signUpData);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: 'User Sign up is successfully !',
+        data: result,
+    });
+}));
 exports.default = {
     loginUser,
-    refreshToken,
+    signUp,
 };

@@ -16,11 +16,22 @@ exports.AuthService = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const ApiError_1 = __importDefault(require("../../errors/ApiError"));
 const jwtHelpers_1 = require("../../helpers/jwtHelpers");
-const users_model_1 = require("../users/users.model");
 const config_1 = __importDefault(require("../../config"));
+const users_model_1 = require("../users/users.model");
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const signup = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, password } = payload;
+    const isUserExist = yield users_model_1.User.isUserExist(email);
+    if (isUserExist) {
+        throw new ApiError_1.default(http_status_1.default.FOUND, 'user already exist');
+    }
+    const hashPassword = yield bcrypt_1.default.hash(password, Number(config_1.default.bcrypt_salt_rounds));
+    const user = yield users_model_1.User.create(Object.assign(Object.assign({}, payload), { password: hashPassword }));
+    return user;
+});
 const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const { phoneNumber, password } = payload;
-    const isUserExist = yield users_model_1.User.isUserExist(phoneNumber);
+    const { email, password } = payload;
+    const isUserExist = yield users_model_1.User.isUserExist(email);
     if (!isUserExist) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User does not exist');
     }
@@ -28,36 +39,14 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     if (isUserExist.password && !isPasswordMatched) {
         throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, 'Password is incorrect');
     }
-    const { _id: userId, role } = isUserExist;
-    const accessToken = jwtHelpers_1.jwtHelpers.createToken({ userId, role }, config_1.default.jwt.secret, config_1.default.jwt.expires_in);
-    const refreshToken = jwtHelpers_1.jwtHelpers.createToken({ userId, role }, config_1.default.jwt.refresh_secret, config_1.default.jwt.refresh_expires_in);
+    const { _id: userId, email: userEmail } = isUserExist;
+    const accessToken = jwtHelpers_1.jwtHelpers.createToken({ userId, userEmail }, config_1.default.jwt.secret, config_1.default.jwt.expires_in);
     return {
         accessToken,
-        refreshToken,
+        wishList: isUserExist.wishlist
     };
 });
-const refreshToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
-    const verifiedToken = jwtHelpers_1.jwtHelpers.verifyToken(token, config_1.default.jwt.refresh_secret);
-    if (verifiedToken) {
-        const { userId } = verifiedToken;
-        console.log('user id', userId);
-        const isUserExist = yield users_model_1.User.isUserExist('', userId);
-        if (!isUserExist) {
-            throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User does not exist');
-        }
-        const newAccessToken = jwtHelpers_1.jwtHelpers.createToken({
-            userId: isUserExist.id,
-            role: isUserExist.role,
-        }, config_1.default.jwt.secret, config_1.default.jwt.expires_in);
-        return {
-            accessToken: newAccessToken,
-        };
-    }
-    else {
-        throw new ApiError_1.default(http_status_1.default.FORBIDDEN, 'Invalid Refresh Token');
-    }
-});
 exports.AuthService = {
+    signup,
     loginUser,
-    refreshToken,
 };

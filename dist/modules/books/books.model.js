@@ -23,51 +23,53 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Cow = void 0;
+exports.Book = void 0;
+/* eslint-disable @typescript-eslint/no-this-alias */
 const mongoose_1 = __importStar(require("mongoose"));
-const cows_constants_1 = require("./cows.constants");
-const cowSchema = new mongoose_1.Schema({
-    name: {
+const bookSchema = new mongoose_1.Schema({
+    title: {
         type: String,
         required: true,
     },
-    age: {
-        type: Number,
-        required: true,
+    author: {
+        type: String,
+    },
+    genre: {
+        type: String,
+    },
+    publication_date: {
+        type: String,
+    },
+    img_url: {
+        type: String,
     },
     price: {
         type: Number,
         required: true,
     },
-    label: {
+    description: {
         type: String,
-        enum: Object.values(cows_constants_1.Label),
-        default: cows_constants_1.Label.for_sale,
     },
-    category: {
-        type: String,
-        required: true,
-        enum: Object.values(cows_constants_1.Category),
-    },
-    location: {
-        type: String,
-        required: true,
-        enum: cows_constants_1.Locations,
-    },
-    breed: {
-        type: String,
-        required: true,
-        enum: Object.values(cows_constants_1.Breed),
-    },
-    weight: {
-        type: String,
-        required: true,
-    },
-    seller: {
+    reviews: [
+        {
+            user: {
+                type: String,
+            },
+            comment: {
+                type: String,
+            },
+        },
+    ],
+    user: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'User',
     },
 }, {
     timestamps: true,
 });
-exports.Cow = mongoose_1.default.model('Cow', cowSchema);
+bookSchema.index({
+    title: 'text',
+    author: 'text',
+    genre: 'text',
+});
+exports.Book = mongoose_1.default.model('Book', bookSchema);

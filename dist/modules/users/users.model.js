@@ -39,21 +39,7 @@ exports.User = void 0;
 /* eslint-disable @typescript-eslint/no-this-alias */
 const mongoose_1 = __importStar(require("mongoose"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const config_1 = __importDefault(require("../../config"));
 const userSchema = new mongoose_1.Schema({
-    id: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    role: {
-        type: String,
-        required: true,
-    },
-    password: {
-        type: String,
-        select: false, // Hide the hashedPassword field in response object to prevent leakage of sensitive
-    },
     name: {
         firstName: {
             type: String,
@@ -64,29 +50,30 @@ const userSchema = new mongoose_1.Schema({
             required: true,
         },
     },
-    phoneNumber: {
+    email: {
         type: String,
+        unique: true,
     },
-    address: {
+    password: {
         type: String,
-        required: true,
+        select: false, // Hide the hashedPassword field in response object to prevent leakage of sensitive
     },
-    budget: {
-        type: Number,
-        default: 0,
-    },
-    income: {
-        type: Number,
-        default: 0,
-    },
+    wishlist: [
+        {
+            bookId: {
+                type: mongoose_1.Schema.Types.ObjectId,
+                ref: 'Book',
+            },
+        },
+    ],
 }, {
     timestamps: true,
 });
-userSchema.statics.isUserExist = function (phone, id) {
+userSchema.statics.isUserExist = function (email) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield exports.User.findOne({
-            $or: [{ phoneNumber: phone }, { id: id }],
-        }).select('+password');
+        return yield exports.User.findOne({ email: email })
+            .select('+password')
+            .populate('wishlist.bookId');
     });
 };
 userSchema.statics.isPasswordMatched = function (givenPassword, savedPassword) {
@@ -95,14 +82,15 @@ userSchema.statics.isPasswordMatched = function (givenPassword, savedPassword) {
     });
 };
 // User.create() / user.save()
-userSchema.pre('save', function (next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // hashing user password
-        const user = this;
-        user.password = yield bcrypt_1.default.hash(user.password, Number(config_1.default.bcrypt_salt_rounds));
-        next();
-    });
-});
+// userSchema.pre('save', async function (next) {
+//   // hashing user password
+//   const user = this
+//   user.password = await bcrypt.hash(
+//     user.password,
+//     Number(config.bcrypt_salt_rounds)
+//   )
+//   next()
+// })
 //remove password field
 userSchema.methods.toJSON = function () {
     const user = this.toObject();
